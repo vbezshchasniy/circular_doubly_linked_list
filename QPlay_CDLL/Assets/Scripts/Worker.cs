@@ -1,71 +1,128 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 
-public class Worker : MonoBehaviour {
+public class Worker
+{
+    private Container _instance;
+    private List<bool> _nodes;
 
-    [SerializeField] private int Nodes = 50;
-
-    private Container ContainerInstance;
-    private List<bool> TmpNodes;
-
+    public Worker(Container instance)
+    {
+        _instance = instance;
+    }
 
     // Use this for initialization
-    void OnEnable () {
-        Debug.Log("Start");
-        ContainerInstance = new Container(Nodes);
-        Debug.Log("Nodes created: " + Nodes);
-        int count = CountNodes();
-        Debug.Log("Nodes counts: " + count);
+    void OnEnable()
+    {
+
     }
 
     // Update is called once per frame
-    void Update () {
-		
-	}
-
-    private int CountNodes()
+    void Update()
     {
-        TmpNodes = new List<bool>();
-        ContainerInstance.MoveBackward();
-        bool endCachedValue = ContainerInstance.Value;
-        ContainerInstance.MoveForward();
+
+    }
+
+    public int CountNodes(Container instance = null)
+    {
+        Container Instance =  instance ?? _instance;
+        _nodes = new List<bool>();
+
+        Instance.MoveBackward();
+        bool endCachedValue = Instance.Value;
+        Instance.MoveForward();
 
         while (true)
         {
-            TmpNodes.Add(ContainerInstance.Value);
-            int cnt = TmpNodes.Count;
+            _nodes.Add(Instance.Value);
+            int cnt = _nodes.Count;
             MoveBackward(cnt);
-            if (TmpNodes[cnt-1] != ContainerInstance.Value)
+            if (_nodes[cnt - 1] != Instance.Value)
             {
                 MoveForward(cnt + 1);
                 continue;
             }
 
-            bool tmp = ContainerInstance.Value;
-            ContainerInstance.Value = !ContainerInstance.Value;
+            bool tmp = Instance.Value;
+            Instance.Value = !Instance.Value;
             MoveForward(cnt);
-            if (tmp != ContainerInstance.Value)
+            if (tmp != Instance.Value)
             {
-                TmpNodes[cnt - 1] = endCachedValue;
+                _nodes[cnt - 1] = endCachedValue;
                 break;
             }
 
-            ContainerInstance.Value = !ContainerInstance.Value;
-            ContainerInstance.MoveForward();
+            Instance.Value = !Instance.Value;
+            Instance.MoveForward();
         }
 
-        return TmpNodes.Count;
+        return _nodes.Count;
     }
 
-    private void MoveBackward(int count)
+    public int CountNodes2(Container instance = null)
     {
-        for (int i = 0; i < count; i++)
-            ContainerInstance.MoveBackward();
+        Container Instance = instance ?? _instance;
+        _nodes = new List<bool>();
+
+        SaveNodeState(Instance.Value);
+        _nodes.Add(Instance.Value);
+        int iteration = 1;
+        Instance.Value = true;
+
+        while (true)
+        {
+            Instance.MoveForward();
+            SaveNodeState(Instance.Value);
+            if (Instance.Value)
+            {
+                Instance.Value = false;
+                MoveBackward(iteration);
+                if (Instance.Value)
+                {
+                    MoveForward(iteration);
+                    iteration++;
+                    continue;
+                }
+                else
+                {
+                    BackupContainer();
+                    return iteration;
+                }
+            }
+            iteration++;
+        }
     }
 
-    private void MoveForward(int count)
+    private void SaveNodeState(bool value)
     {
-        for (int i = 0; i < count; i++)
-            ContainerInstance.MoveForward();
+        _nodes.Add(value);
     }
+
+    private void BackupContainer(Container instance = null)
+    {
+        Container Instance = instance ?? _instance;
+
+        for (int i = 0; i < _nodes.Count; i++)
+        {
+            Instance.Value = _nodes[i];
+            Instance.MoveForward();
+        }
+    }
+
+    private void MoveBackward(int count, Container instance = null)
+    {
+        Container Instance = instance ?? _instance;
+
+        for (int i = 0; i < count; i++)
+            Instance.MoveBackward();
+    }
+
+    private void MoveForward(int count, Container instance = null)
+    {
+        Container Instance = instance ?? _instance;
+
+        for (int i = 0; i < count; i++)
+            Instance.MoveForward();
+    }
+
 }
