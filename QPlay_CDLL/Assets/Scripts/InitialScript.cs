@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
+[ObsoleteAttribute("This Class is obsolete. Use Autotest instead.")]
 public class InitialScript : MonoBehaviour {
 
     [SerializeField] private int Nodes = 50;
