@@ -13,22 +13,14 @@ public class InitialScript : MonoBehaviour {
 
     private void OnEnable()
     {
-        Debug.Log("New");
         Container ContainerInstance = new Container(Nodes);
         Debug.Log("Nodes created: " + Nodes);
-
         Worker WorkerItem = new Worker(ContainerInstance);
-        Debug.Log("Woker created");
-
         var watch = System.Diagnostics.Stopwatch.StartNew();
+        watch.Start();
         int count = WorkerItem.CountNodes();
         watch.Stop();
-        Debug.Log(string.Format("First Nodes counts {0}, Time spent {1}: ", count, watch.ElapsedMilliseconds));
-        watch.Reset();
-        watch.Start();
-        int count2 = WorkerItem.CountNodes2();
-        watch.Stop();
-        Debug.Log(string.Format("Second Nodes counts {0}, Time spent {1}: ", count2, watch.ElapsedMilliseconds));
+        Debug.Log(string.Format("Second Nodes counts {0}, Time spent {1}: ", count, watch.ElapsedMilliseconds));
     }
 
     // Update is called once per frame

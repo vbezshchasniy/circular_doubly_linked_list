@@ -11,68 +11,28 @@ public class Worker
         _instance = instance;
     }
 
-    // Use this for initialization
-    void OnEnable()
+    public List<bool> Nodes
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        get
+        {
+            return _nodes;
+        }
     }
 
     public int CountNodes(Container instance = null)
     {
-        Container Instance =  instance ?? _instance;
-        _nodes = new List<bool>();
-
-        Instance.MoveBackward();
-        bool endCachedValue = Instance.Value;
-        Instance.MoveForward();
-
-        while (true)
-        {
-            _nodes.Add(Instance.Value);
-            int cnt = _nodes.Count;
-            MoveBackward(cnt);
-            if (_nodes[cnt - 1] != Instance.Value)
-            {
-                MoveForward(cnt + 1);
-                continue;
-            }
-
-            bool tmp = Instance.Value;
-            Instance.Value = !Instance.Value;
-            MoveForward(cnt);
-            if (tmp != Instance.Value)
-            {
-                _nodes[cnt - 1] = endCachedValue;
-                break;
-            }
-
-            Instance.Value = !Instance.Value;
-            Instance.MoveForward();
-        }
-
-        return _nodes.Count;
-    }
-
-    public int CountNodes2(Container instance = null)
-    {
         Container Instance = instance ?? _instance;
         _nodes = new List<bool>();
 
-        SaveNodeState(Instance.Value);
-        _nodes.Add(Instance.Value);
         int iteration = 1;
+        SaveNodeState(Instance.Value);
         Instance.Value = true;
 
         while (true)
         {
             Instance.MoveForward();
             SaveNodeState(Instance.Value);
+
             if (Instance.Value)
             {
                 Instance.Value = false;
@@ -85,6 +45,7 @@ public class Worker
                 }
                 else
                 {
+                    RemoveLastNode(iteration);
                     BackupContainer();
                     return iteration;
                 }
@@ -96,6 +57,11 @@ public class Worker
     private void SaveNodeState(bool value)
     {
         _nodes.Add(value);
+    }
+
+    private void RemoveLastNode(int index)
+    {
+        _nodes.RemoveAt(index);
     }
 
     private void BackupContainer(Container instance = null)
