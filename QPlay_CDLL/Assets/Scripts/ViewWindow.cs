@@ -32,6 +32,8 @@ public class ViewWindow : EditorWindow
     private const string ButtonName = "Create New";
 
     List<bool> CurrentList = new List<bool>(Items);
+//    List<int> CurrentListI = new List<int>(Items);
+
     Vector2 Scroll;
     private Container ContainerInstance;
     private GUIStyle StyleForTrue;
@@ -39,7 +41,7 @@ public class ViewWindow : EditorWindow
 
     void OnEnable()
     {
-        Scroll = new Vector2(0, 0);
+        Scroll = new Vector2(0, 1);
         InitGUIStyle();
         IninContainer();
     }
@@ -53,31 +55,34 @@ public class ViewWindow : EditorWindow
     private void CreateBoxes(Direction direction = Direction.None)
     {
         if (direction != Direction.None)
-            Scroll = new Vector2(0, direction == Direction.Up ? Height : 0);
+            Scroll = new Vector2(0, direction == Direction.Up ? Height : 1);
         DrawBoxes(CurrentList);
     }
 
     void OnGUI()
     {
-        Rect ScrollView = new Rect(0, 0, Width, Height - ItemSize.y);
-        Rect ViewRect = new Rect(0, 0, Width, Height - ItemSize.y);
+        Rect ScrollView = new Rect(0, 0, Width, Height);
+        Rect ViewRect = new Rect(0, 0, Width, Height * 3);
 
         Scroll = GUI.BeginScrollView(ScrollView, Scroll, ViewRect, false, false, GUIStyle.none, GUIStyle.none);
 
-        GUI.EndScrollView();
-
-        if (Scroll.y <= 0.0f)
+        if (Scroll.y < 1f)
         {
             GetNodes(Direction.Up);
             CreateBoxes(Direction.Up);
         }
-        else if (Scroll.y >= Height)
+
+        else if (Scroll.y > Height + 1)
         {
             GetNodes(Direction.Down);
             CreateBoxes(Direction.Down);
         }
         else
             CreateBoxes();
+
+        GUI.EndScrollView();
+
+        Debug.Log(Scroll);
 
         if (GUI.Button(new Rect(0, Height - ItemSize.y, Width, ItemSize.y), ButtonName))
         {
@@ -92,7 +97,9 @@ public class ViewWindow : EditorWindow
             int boxY = i * ItemHieght + Padding - Height;
             Rect rectBox = new Rect(Padding, boxY, ItemWidth - Padding * 2, ItemHieght - Padding);
             bool value = list[i];
-            GUI.Box(rectBox, "<b>"+value.ToString()+"</b>", value ? StyleForTrue : StyleForFalse);
+            GUI.Box(rectBox, string.Format("<b>{0}</b>", value), value ? StyleForTrue : StyleForFalse);
+//            GUI.Box(rectBox, string.Format("<b> Number: {0} - {1}</b>", CurrentListI[i], value),
+//                value ? StyleForTrue : StyleForFalse);
         }
     }
 
@@ -100,31 +107,47 @@ public class ViewWindow : EditorWindow
     private void GetNodes(Direction direction)
     {
         CurrentList.Clear();
+//        CurrentListI.Clear();
 
         switch (direction)
         {
             case Direction.None:
-            case Direction.Down:
                 for (int i = 0; i < Items / 3; i++)
                     ContainerInstance.MoveBackward();
 
 
-                for (int i = 0; i < Items * 2 / 3; i++)
+                for (int i = 0; i < Items; i++)
                 {
                     CurrentList.Add(ContainerInstance.Value);
+//                    CurrentListI.Add(ContainerInstance.Number);
+                    ContainerInstance.MoveForward();
+                }
+
+                break;
+            case Direction.Down:
+                for (int i = 0; i < Items * 2 / 3; i++)
+                    ContainerInstance.MoveBackward();
+
+
+                for (int i = 0; i < Items; i++)
+                {
+                    CurrentList.Add(ContainerInstance.Value);
+//                    CurrentListI.Add(ContainerInstance.Number);
                     ContainerInstance.MoveForward();
                 }
 
                 break;
             case Direction.Up:
-                for (int i = 0; i < Items / 3; i++)
-                    ContainerInstance.MoveForward();
 
+                for (int i = 0; i < Items + Items / 3; i++)
+                    ContainerInstance.MoveBackward();
 
-                for (int i = 0; i < Items * 2 / 3; i++)
+                for (int i = 0; i < Items; i++)
                 {
                     CurrentList.Add(ContainerInstance.Value);
-                    ContainerInstance.MoveBackward();
+//                    CurrentListI.Add(ContainerInstance.Number);
+
+                    ContainerInstance.MoveForward();
                 }
 
                 break;
@@ -156,6 +179,5 @@ public class ViewWindow : EditorWindow
         StyleForFalse.normal.background = TextureForFalse;
         StyleForFalse.alignment = TextAnchor.MiddleCenter;
         StyleForFalse.richText = true;
-
     }
 }

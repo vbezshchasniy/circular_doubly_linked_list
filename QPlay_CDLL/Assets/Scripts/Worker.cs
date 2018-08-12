@@ -24,33 +24,30 @@ public class Worker
         Container Instance = instance ?? _instance;
         _nodes = new List<bool>();
 
-        int iteration = 1;
+        int iteration = 0;
         SaveNodeState(Instance.Value);
         Instance.Value = true;
 
         while (true)
         {
+            iteration++;
             Instance.MoveForward();
             SaveNodeState(Instance.Value);
 
+            if (!Instance.Value)
+                continue;
+            Instance.Value = false;
+            MoveBackward(iteration);
             if (Instance.Value)
             {
-                Instance.Value = false;
-                MoveBackward(iteration);
-                if (Instance.Value)
-                {
-                    MoveForward(iteration);
-                    iteration++;
-                    continue;
-                }
-                else
-                {
-                    RemoveLastNode(iteration);
-                    BackupContainer();
-                    return iteration;
-                }
+                MoveForward(iteration);
             }
-            iteration++;
+            else
+            {
+                RemoveLastNode(iteration);
+                BackupContainer();
+                return iteration;
+            }
         }
     }
 
