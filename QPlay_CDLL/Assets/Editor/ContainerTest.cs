@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using NUnit.Framework;
 
-public class NewEditorTest
+public class ContainerTest
 {
 
     [Test]
@@ -16,7 +16,7 @@ public class NewEditorTest
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var count = workerItem.CountNodes();
         watch.Stop();
-        Debug.Log(string.Format("Nodes counts {0}, Time spent {1}: ", count, watch.ElapsedMilliseconds));
+        Debug.Log(string.Format("Nodes counts {0}, Time spent {1}: ms", count, watch.ElapsedMilliseconds));
 
         Assert.AreEqual(nodes, count);
     }
