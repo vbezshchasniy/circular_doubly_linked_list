@@ -22,9 +22,12 @@ public class ViewWindow : EditorWindow
     private const int Width = 400;
     private const int Height = 800;
     private const int Padding = 5;
+    private const int PaddingY = 15;
+
     private const int ItemWidth = 400;
     private const int ItemHieght = 100;
     private const int Items = Height / ItemHieght;
+
     /// <summary>
     /// items[8] up
     /// items[8] currently seen
@@ -94,8 +97,8 @@ public class ViewWindow : EditorWindow
     {
         for (int i = 0; i < list.Count; i++)
         {
-            int boxY = i * ItemHieght + Padding - Height;
-            Rect rectBox = new Rect(Padding, boxY, ItemWidth - Padding * 2, ItemHieght - Padding);
+            int boxY = i * ItemHieght + PaddingY - Height;
+            Rect rectBox = new Rect(Padding, boxY, ItemWidth - Padding * 2, ItemHieght - PaddingY);
             bool value = list[i];
             GUI.Box(rectBox, string.Format("<b>{0}</b>", value), value ? StyleForTrue : StyleForFalse);
 //            GUI.Box(rectBox, string.Format("<b> Number: {0} - {1}</b>", CurrentListI[i], value),
