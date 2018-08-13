@@ -7,16 +7,16 @@ public class NewEditorTest
     [Test]
     public void ContainerElementsSizeTest()
     {
-        int nodes = 800;
+        const int nodes = 800;
         Debug.Log("Run ContainerElementsSizeTest");
-        Container ContainerInstance = new Container(nodes);
-        Debug.Log("Nodes created: " + nodes);
-        Worker WorkerItem = new Worker(ContainerInstance);
+        var containerInstance = new Container(nodes);
+        Debug.Log(string.Format("Nodes created: {0}", nodes));
+        var workerItem = new Worker(containerInstance);
         Debug.Log("Woker created");
         var watch = System.Diagnostics.Stopwatch.StartNew();
-        int count = WorkerItem.CountNodes();
+        var count = workerItem.CountNodes();
         watch.Stop();
-        Debug.Log(string.Format("Nodes counts {0}, Time spent {1}: ", count, WorkerItem.Nodes.Count, watch.ElapsedMilliseconds));
+        Debug.Log(string.Format("Nodes counts {0}, Time spent {1}: ", count, watch.ElapsedMilliseconds));
 
         Assert.AreEqual(nodes, count);
     }

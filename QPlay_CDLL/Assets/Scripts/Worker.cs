@@ -1,54 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class Worker
 {
-    private Container _instance;
+    private readonly Container _instance;
     private List<bool> _nodes;
 
     public Worker(Container instance)
     {
         _instance = instance;
-    }
-
-    public List<bool> Nodes
-    {
-        get
-        {
-            return _nodes;
-        }
-    }
-
-    public int CountNodes(Container instance = null)
-    {
-        Container Instance = instance ?? _instance;
-        _nodes = new List<bool>();
-
-        int iteration = 0;
-        SaveNodeState(Instance.Value);
-        Instance.Value = true;
-
-        while (true)
-        {
-            iteration++;
-            Instance.MoveForward();
-            SaveNodeState(Instance.Value);
-
-            if (!Instance.Value)
-                continue;
-            Instance.Value = false;
-            MoveBackward(iteration);
-            if (Instance.Value)
-            {
-                MoveForward(iteration);
-            }
-            else
-            {
-                RemoveLastNode(iteration);
-                BackupContainer();
-                return iteration;
-            }
-        }
     }
 
     private void SaveNodeState(bool value)
@@ -61,31 +20,62 @@ public class Worker
         _nodes.RemoveAt(index);
     }
 
-    private void BackupContainer(Container instance = null)
+    private void BackupContainer(Container arg = null)
     {
-        Container Instance = instance ?? _instance;
+        var instance = arg ?? _instance;
 
-        for (int i = 0; i < _nodes.Count; i++)
+        foreach (var item in _nodes)
         {
-            Instance.Value = _nodes[i];
-            Instance.MoveForward();
+            instance.Value = item;
+            instance.MoveForward();
         }
     }
 
-    private void MoveBackward(int count, Container instance = null)
+    private void MoveBackward(int count, Container arg = null)
     {
-        Container Instance = instance ?? _instance;
+        var instance = arg ?? _instance;
 
-        for (int i = 0; i < count; i++)
-            Instance.MoveBackward();
+        for (var i = 0; i < count; i++)
+            instance.MoveBackward();
     }
 
-    private void MoveForward(int count, Container instance = null)
+    private void MoveForward(int count, Container arg = null)
     {
-        Container Instance = instance ?? _instance;
+        var instance = arg ?? _instance;
 
-        for (int i = 0; i < count; i++)
-            Instance.MoveForward();
+        for (var i = 0; i < count; i++)
+            instance.MoveForward();
     }
 
+    public int CountNodes(Container arg = null)
+    {
+        var instance = arg ?? _instance;
+        _nodes = new List<bool>();
+
+        var iteration = 0;
+        SaveNodeState(instance.Value);
+        instance.Value = true;
+
+        while (true)
+        {
+            iteration++;
+            instance.MoveForward();
+            SaveNodeState(instance.Value);
+
+            if (!instance.Value)
+                continue;
+            instance.Value = false;
+            MoveBackward(iteration);
+            if (instance.Value)
+            {
+                MoveForward(iteration);
+            }
+            else
+            {
+                RemoveLastNode(iteration);
+                BackupContainer();
+                return iteration;
+            }
+        }
+    }
 }
