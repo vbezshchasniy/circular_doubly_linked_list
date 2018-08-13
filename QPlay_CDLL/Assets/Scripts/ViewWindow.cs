@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +8,7 @@ public class ViewWindow : EditorWindow
     [MenuItem("Window/View Window")]
     public static void ShowWindow()
     {
-        GetWindowWithRect<ViewWindow>(new Rect(0, 0, 400, 800));
+        GetWindowWithRect<ViewWindow>(new Rect(0, 0, Width, Height));
     }
 
     private enum Direction
@@ -19,19 +18,22 @@ public class ViewWindow : EditorWindow
         Down
     };
 
+    private const string ButtonName = "Create New";
     private const int Width = 400;
     private const int Height = 800;
-    private const int Items = Height / ItemHieght * 3;
-
     private const int Padding = 5;
-    private const int ItemHieght = 100;
     private const int ItemWidth = 400;
+    private const int ItemHieght = 100;
+    private const int Items = Height / ItemHieght;
+    /// <summary>
+    /// items[8] up
+    /// items[8] currently seen
+    /// items[8] down
+    /// </summary>
+    private const int FullReel = Items * 3;
 
-    private static readonly Vector2 ItemSize = new Vector2(ItemWidth, ItemHieght);
 
-    private const string ButtonName = "Create New";
-
-    List<bool> CurrentList = new List<bool>(Items);
+    List<bool> CurrentList = new List<bool>(FullReel);
 //    List<int> CurrentListI = new List<int>(Items);
 
     Vector2 Scroll;
@@ -39,7 +41,7 @@ public class ViewWindow : EditorWindow
     private GUIStyle StyleForTrue;
     private GUIStyle StyleForFalse;
 
-    void OnEnable()
+    private void OnEnable()
     {
         Scroll = new Vector2(0, 1);
         InitGUIStyle();
@@ -59,12 +61,12 @@ public class ViewWindow : EditorWindow
         DrawBoxes(CurrentList);
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
-        Rect ScrollView = new Rect(0, 0, Width, Height);
-        Rect ViewRect = new Rect(0, 0, Width, Height * 3);
+        var scrollView = new Rect(0, 0, Width, Height);
+        var viewRect = new Rect(0, 0, Width, Height * 3);
 
-        Scroll = GUI.BeginScrollView(ScrollView, Scroll, ViewRect, false, false, GUIStyle.none, GUIStyle.none);
+        Scroll = GUI.BeginScrollView(scrollView, Scroll, viewRect, false, false, GUIStyle.none, GUIStyle.none);
 
         if (Scroll.y < 1f)
         {
@@ -84,10 +86,8 @@ public class ViewWindow : EditorWindow
 
         Debug.Log(Scroll);
 
-        if (GUI.Button(new Rect(0, Height - ItemSize.y, Width, ItemSize.y), ButtonName))
-        {
+        if (GUI.Button(new Rect(0, Height - ItemHieght, Width, ItemHieght), ButtonName))
             IninContainer();
-        }
     }
 
     private void DrawBoxes(List<bool> list)
@@ -112,11 +112,11 @@ public class ViewWindow : EditorWindow
         switch (direction)
         {
             case Direction.None:
-                for (int i = 0; i < Items / 3; i++)
+                for (int i = 0; i < Items; i++)
                     ContainerInstance.MoveBackward();
 
 
-                for (int i = 0; i < Items; i++)
+                for (int i = 0; i < FullReel; i++)
                 {
                     CurrentList.Add(ContainerInstance.Value);
 //                    CurrentListI.Add(ContainerInstance.Number);
@@ -125,11 +125,12 @@ public class ViewWindow : EditorWindow
 
                 break;
             case Direction.Down:
-                for (int i = 0; i < Items * 2 / 3; i++)
+                // Move 2 screens down
+                for (int i = 0; i < Items * 2; i++)
                     ContainerInstance.MoveBackward();
 
 
-                for (int i = 0; i < Items; i++)
+                for (int i = 0; i < FullReel; i++)
                 {
                     CurrentList.Add(ContainerInstance.Value);
 //                    CurrentListI.Add(ContainerInstance.Number);
@@ -139,10 +140,10 @@ public class ViewWindow : EditorWindow
                 break;
             case Direction.Up:
 
-                for (int i = 0; i < Items + Items / 3; i++)
+                for (int i = 0; i < FullReel + Items; i++)
                     ContainerInstance.MoveBackward();
 
-                for (int i = 0; i < Items; i++)
+                for (int i = 0; i < FullReel; i++)
                 {
                     CurrentList.Add(ContainerInstance.Value);
 //                    CurrentListI.Add(ContainerInstance.Number);
